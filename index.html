@@ -1,0 +1,97 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2685.6">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; -webkit-text-stroke: #000000}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; -webkit-text-stroke: #000000; min-height: 14.0px}
+    span.s1 {font-kerning: none}
+  </style>
+</head>
+<body>
+<p class="p1"><span class="s1">&lt;!DOCTYPE html&gt;</span></p>
+<p class="p1"><span class="s1">&lt;html&gt;</span></p>
+<p class="p1"><span class="s1">&lt;head&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;title&gt;Delphi ICD-10 Explorer&lt;/title&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;script src="https://cdn.plot.ly/plotly-latest.min.js"&gt;&lt;/script&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;script src="https://d3js.org/d3.v7.min.js"&gt;&lt;/script&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;style&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; }</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>#plot { width: 90vw; height: 80vh; }</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>#info { margin-top: 20px; padding: 15px; border: 1px solid #ddd; border-radius: 8px; width: 80%; background: #f9f9f9; }</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/style&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/head&gt;</span></p>
+<p class="p1"><span class="s1">&lt;body&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;h2&gt;Delphi AI: ICD-10 Embedding Visualization&lt;/h2&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;div id="plot"&gt;&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;div id="info"&gt;Click two points to compare cosine similarity.&lt;/div&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;script&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>let allData = [];</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>let selection = [];</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>d3.csv("embeddings.csv").then(data =&gt; {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>allData = data;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>renderPlot(data);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>});</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>function renderPlot(data) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const trace = {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>x: data.map(d =&gt; d.umap_x),</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>y: data.map(d =&gt; d.umap_y),</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>mode: 'markers',</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>type: 'scatter',</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>text: data.map(d =&gt; d.name),</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>marker: { color: data.map(d =&gt; d.color), size: 8 }</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>};</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>Plotly.newPlot('plot', [trace], { hovermode: 'closest' });</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>document.getElementById('plot').on('plotly_click', function(data){</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>const pointIndex = data.points[0].pointNumber;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>const pointData = allData[pointIndex];</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">                </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>selection.push(pointData);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>if (selection.length &gt; 2) selection.shift();</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>updateUI();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>});</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>function cosineSimilarity(vecA, vecB) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>let dotProduct = 0;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>let normA = 0;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>let normB = 0;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>for (let i = 0; i &lt; 120; i++) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>let a = parseFloat(vecA[`emb_${i}`]);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>let b = parseFloat(vecB[`emb_${i}`]);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>dotProduct += a * b;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>normA += a * a;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>normB += b * b;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>function updateUI() {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const infoDiv = document.getElementById('info');</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>if (selection.length === 2) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>const sim = cosineSimilarity(selection[0], selection[1]);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>infoDiv.innerHTML = `</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>&lt;strong&gt;Point 1:&lt;/strong&gt; ${selection[0].name} (${selection[0].icd3})&lt;br&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>&lt;strong&gt;Point 2:&lt;/strong&gt; ${selection[1].name} (${selection[1].icd3})&lt;br&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>&lt;strong&gt;Cosine Similarity:&lt;/strong&gt; ${sim.toFixed(4)}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>`;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>} else {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>infoDiv.innerHTML = `Selected: ${selection[0].name}. Click another point...`;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/script&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/body&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/html&gt;</span></p>
+</body>
+</html>
