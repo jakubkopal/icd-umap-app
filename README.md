@@ -17,7 +17,7 @@ Genetic studies have revealed substantial pleiotropy crossing the neurologicalâ€
 
 An interactive UMAP explorer of the Delphi-2M disease embedding space is available at:
 
-**[username.github.io/neuropsych-boundary](https://jakubkopal.github.io/neuropsych-boundary)**
+**[jakubkopal.github.io/neuropsych-boundary](https://jakubkopal.github.io/neuropsych-boundary)**
 
 Click any two disorders to compute their pairwise cosine similarity across the full 120-dimensional embedding space.
 
