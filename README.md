@@ -11,6 +11,9 @@ Code and interactive supplement to the manuscript submitted to *Nature Neuroscie
 
 Genetic studies have revealed substantial pleiotropy crossing the neurological–psychiatric boundary, but whether clinical trajectory similarity follows the same pattern is unknown. Combining disease trajectory embeddings from a foundation model with genome-wide genetic similarity estimates, we find that clinical trajectory similarity mirrors genetic pleiotropy, including which disorders cross the boundary. These findings support a more integrated approach to brain disease across the traditional neurological–psychiatric divide.
 
+![Figure 2](Figures/Fig2.png)
+*Figure 2: Boundary structure in clinical and genetic similarity. (a) Each disorder is positioned according to its clinical and genetic boundary strength — the difference between average within-category and cross-category similarity. Positive values indicate greater similarity to own category; negative values indicate boundary crossing. Multiple sclerosis, migraine, and essential tremor fall in the lower-left quadrant, crossing the boundary in both measures. (b) For each disorder, the difference between mean similarity to psychiatric and neurological disorders is shown separately for clinical (circle) and genetic (square) similarity. Positive values indicate greater similarity to psychiatric disorders.*
+
 ---
 
 ## Interactive visualization
