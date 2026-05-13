@@ -1,4 +1,4 @@
-# Clinical trajectories and genetic architecture trace the same boundary between neurological and psychiatric disorders
+# Clinical trajectories and genetic architecture across the neurological–psychiatric boundary
 
 [![MIT License](https://img.shields.io/badge/License-MIT-blue.svg)](https://lbesson.mit-license.org/)
 [![DOI](https://img.shields.io/badge/DOI-pending-lightgrey)]()
