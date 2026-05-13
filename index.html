@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delphi-2M · Disease Embedding Explorer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600&family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        :root {
+            --bg: #fafaf7;
+            --surface: #ffffff;
+            --ink: #1a1a1a;
+            --ink-soft: #4a4a4a;
+            --ink-faint: #8a8a8a;
+            --rule: #e8e6e0;
+            --accent: #b8472e;
+            --accent-soft: #f5e9e4;
+            --highlight: #f4f1ea;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            background: var(--bg);
+            color: var(--ink);
+            font-family: 'Inter', system-ui, sans-serif;
+            font-size: 15px;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 48px 40px 80px;
+        }
+
+        /* HEADER */
+        header {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            align-items: end;
+            gap: 40px;
+            padding-bottom: 32px;
+            border-bottom: 1px solid var(--rule);
+            margin-bottom: 40px;
+        }
+
+        .title-block .eyebrow {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--ink-faint);
+            margin-bottom: 16px;
+        }
+
+        h1 {
+            font-family: 'Fraunces', serif;
+            font-weight: 400;
+            font-size: clamp(2rem, 4vw, 3rem);
+            line-height: 1.05;
+            letter-spacing: -0.02em;
+            color: var(--ink);
+            font-variation-settings: "opsz" 144;
+        }
+
+        h1 em {
+            font-style: italic;
+            font-weight: 300;
+            color: var(--accent);
+        }
+
+        .citation {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: var(--ink-faint);
+            text-align: right;
+            line-height: 1.6;
+        }
+
+        .citation a {
+            color: var(--ink-soft);
+            text-decoration: none;
+            border-bottom: 1px solid var(--rule);
+        }
+
+        .citation a:hover {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+
+        /* INTRO */
+        .intro {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 320px;
+            gap: 48px;
+            margin-bottom: 40px;
+        }
+
+        .intro-body {
+            font-family: 'Fraunces', serif;
+            font-size: 17px;
+            line-height: 1.55;
+            color: var(--ink-soft);
+            font-weight: 400;
+            max-width: 60ch;
+        }
+
+        .intro-body strong {
+            color: var(--ink);
+            font-weight: 500;
+        }
+
+        .instructions {
+            background: var(--surface);
+            border: 1px solid var(--rule);
+            padding: 20px 22px;
+            border-radius: 2px;
+        }
+
+        .instructions-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 10px;
+        }
+
+        .instructions ol {
+            list-style: none;
+            counter-reset: step;
+            font-size: 13px;
+            color: var(--ink-soft);
+        }
+
+        .instructions li {
+            counter-increment: step;
+            padding: 4px 0 4px 24px;
+            position: relative;
+        }
+
+        .instructions li::before {
+            content: counter(step);
+            position: absolute;
+            left: 0;
+            top: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--accent);
+            background: var(--accent-soft);
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+        }
+
+        /* MAIN GRID */
+        .workspace {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 340px;
+            gap: 24px;
+            align-items: start;
+        }
+
+        .plot-panel {
+            background: var(--surface);
+            border: 1px solid var(--rule);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .panel-header {
+            padding: 18px 24px;
+            border-bottom: 1px solid var(--rule);
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 16px;
+        }
+
+        .panel-title {
+            font-family: 'Fraunces', serif;
+            font-size: 18px;
+            font-weight: 500;
+            letter-spacing: -0.01em;
+        }
+
+        .panel-meta {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: var(--ink-faint);
+            letter-spacing: 0.05em;
+        }
+
+        #plot {
+            width: 100%;
+            height: 640px;
+        }
+
+        /* COMPARISON PANEL */
+        .compare-panel {
+            background: var(--surface);
+            border: 1px solid var(--rule);
+            border-radius: 2px;
+            padding: 24px;
+            position: sticky;
+            top: 24px;
+        }
+
+        .compare-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--ink-faint);
+            margin-bottom: 16px;
+        }
+
+        .compare-empty {
+            color: var(--ink-faint);
+            font-family: 'Fraunces', serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 32px 0;
+            text-align: center;
+            border-top: 1px dashed var(--rule);
+            border-bottom: 1px dashed var(--rule);
+        }
+
+        .selection-slot {
+            padding: 14px 0;
+            border-bottom: 1px solid var(--rule);
+        }
+
+        .selection-slot:last-of-type {
+            border-bottom: none;
+        }
+
+        .slot-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            color: var(--ink-faint);
+            margin-bottom: 6px;
+        }
+
+        .slot-empty {
+            font-family: 'Fraunces', serif;
+            font-style: italic;
+            color: var(--ink-faint);
+            font-size: 14px;
+        }
+
+        .slot-name {
+            font-family: 'Fraunces', serif;
+            font-size: 18px;
+            font-weight: 500;
+            color: var(--ink);
+            letter-spacing: -0.01em;
+            line-height: 1.25;
+            margin-bottom: 4px;
+        }
+
+        .slot-meta {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: var(--ink-faint);
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .slot-icd {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .slot-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .slot-chip::before {
+            content: '';
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--chip-color, var(--ink-soft));
+        }
+
+        .result {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid var(--ink);
+        }
+
+        .result-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--ink-faint);
+            margin-bottom: 8px;
+        }
+
+        .result-value {
+            font-family: 'Fraunces', serif;
+            font-size: 56px;
+            font-weight: 300;
+            line-height: 1;
+            letter-spacing: -0.04em;
+            font-variation-settings: "opsz" 144;
+            color: var(--ink);
+        }
+
+        .result-caption {
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            color: var(--ink-faint);
+            margin-top: 8px;
+            line-height: 1.4;
+        }
+
+        .reset-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 16px;
+            padding: 6px 12px;
+            background: transparent;
+            border: 1px solid var(--rule);
+            border-radius: 2px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--ink-soft);
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .reset-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            background: var(--accent-soft);
+        }
+
+        /* LEGEND */
+        .legend-panel {
+            margin-top: 24px;
+            background: var(--surface);
+            border: 1px solid var(--rule);
+            border-radius: 2px;
+            padding: 24px;
+        }
+
+        .legend-title {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--ink-faint);
+            margin-bottom: 16px;
+        }
+
+        .legend-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 10px 20px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+            color: var(--ink-soft);
+        }
+
+        .legend-swatch {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+            flex-shrink: 0;
+            border: 1px solid rgba(0,0,0,0.08);
+        }
+
+        /* FOOTER */
+        footer {
+            margin-top: 64px;
+            padding-top: 24px;
+            border-top: 1px solid var(--rule);
+            display: flex;
+            justify-content: space-between;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: var(--ink-faint);
+            letter-spacing: 0.04em;
+        }
+
+        footer a {
+            color: var(--ink-soft);
+            text-decoration: none;
+            border-bottom: 1px solid var(--rule);
+        }
+
+        footer a:hover {
+            color: var(--accent);
+        }
+
+        /* LOADING */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 640px;
+            font-family: 'Fraunces', serif;
+            font-style: italic;
+            color: var(--ink-faint);
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 1024px) {
+            .container { padding: 32px 24px; }
+            header { grid-template-columns: 1fr; gap: 16px; }
+            .citation { text-align: left; }
+            .intro { grid-template-columns: 1fr; gap: 24px; }
+            .workspace { grid-template-columns: 1fr; }
+            .compare-panel { position: static; }
+            #plot { height: 480px; }
+        }
+
+        @media (max-width: 600px) {
+            .container { padding: 24px 16px; }
+            h1 { font-size: 1.75rem; }
+            .intro-body { font-size: 15px; }
+            #plot { height: 400px; }
+            .result-value { font-size: 44px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="title-block">
+                <div class="eyebrow">Supplementary Materials · Brief Communication</div>
+                <h1>The high-dimensional space of <em>human disease</em>, learned by Delphi-2M</h1>
+            </div>
+            <div class="citation">
+                Built on Shmatko et al. (2025)<br>
+                <a href="https://www.nature.com/articles/s41586-025-09529-3" target="_blank" rel="noopener">Nature · doi:10.1038/s41586-025-09529-3</a>
+            </div>
+        </header>
+
+        <section class="intro">
+            <p class="intro-body">
+                Delphi-2M is a generative foundation model trained on the medical histories of <strong>400,000 UK Biobank participants</strong>. It learns to predict the timing and co-occurrence of <strong>more than 1,000 ICD-10 diagnoses</strong> across the life course, encoding each disorder as a 120-dimensional vector. Two disorders with similar embeddings tend to affect similar patients, at similar ages, and alongside similar other conditions.
+            </p>
+            <div class="instructions">
+                <div class="instructions-label">How to use</div>
+                <ol>
+                    <li>Click any point to select a disorder</li>
+                    <li>Click a second point to compute their cosine similarity</li>
+                    <li>Reset to start a new comparison</li>
+                </ol>
+            </div>
+        </section>
+
+        <section class="workspace">
+            <div class="plot-panel">
+                <div class="panel-header">
+                    <div class="panel-title">UMAP projection of the 120-d embedding space</div>
+                    <div class="panel-meta">1,257 ICD-10 codes</div>
+                </div>
+                <div id="plot"><div class="loading">Loading embeddings…</div></div>
+            </div>
+
+            <aside class="compare-panel">
+                <div class="compare-label">Pairwise Comparison</div>
+                <div id="info"></div>
+            </aside>
+        </section>
+
+        <div class="legend-panel">
+            <div class="legend-title">ICD-10 Chapter</div>
+            <div id="legend" class="legend-grid"></div>
+        </div>
+
+        <footer>
+            <div>Delphi-2M Disease Embedding Explorer</div>
+            <div><a href="https://github.com" target="_blank" rel="noopener">View source</a></div>
+        </footer>
+    </div>
+
+    <script>
+        let allData = [];
+        let selection = [];
+
+        d3.csv("embeddings.csv").then(data => {
+            allData = data;
+            renderPlot(data);
+            renderLegend(data);
+            updateUI();
+        }).catch(err => {
+            document.getElementById('plot').innerHTML =
+                '<div class="loading">Error loading embeddings.csv — check filename and path.</div>';
+            console.error(err);
+        });
+
+        function renderPlot(data) {
+            const trace = {
+                x: data.map(d => +d.umap_x),
+                y: data.map(d => +d.umap_y),
+                mode: 'markers',
+                type: 'scattergl',
+                text: data.map(d => `<b>${d.name}</b><br>ICD-10: ${d.icd3}`),
+                hoverinfo: 'text',
+                marker: {
+                    color: data.map(d => d.color),
+                    size: 7,
+                    line: { color: 'rgba(255,255,255,0.85)', width: 0.6 },
+                    opacity: 0.88
+                }
+            };
+
+            const layout = {
+                margin: { t: 16, b: 16, l: 16, r: 16 },
+                hovermode: 'closest',
+                plot_bgcolor: '#fafaf7',
+                paper_bgcolor: '#ffffff',
+                xaxis: {
+                    showgrid: false,
+                    zeroline: false,
+                    showticklabels: false,
+                    showline: false,
+                    ticks: ''
+                },
+                yaxis: {
+                    showgrid: false,
+                    zeroline: false,
+                    showticklabels: false,
+                    showline: false,
+                    ticks: '',
+                    scaleanchor: 'x',
+                    scaleratio: 1
+                },
+                hoverlabel: {
+                    bgcolor: '#1a1a1a',
+                    bordercolor: '#1a1a1a',
+                    font: {
+                        family: 'JetBrains Mono, monospace',
+                        size: 12,
+                        color: '#fafaf7'
+                    }
+                },
+                dragmode: 'pan'
+            };
+
+            const config = {
+                displayModeBar: true,
+                displaylogo: false,
+                modeBarButtonsToRemove: ['lasso2d', 'select2d', 'autoScale2d'],
+                responsive: true
+            };
+
+            Plotly.newPlot('plot', [trace], layout, config);
+
+            document.getElementById('plot').on('plotly_click', function(evt) {
+                const pointIndex = evt.points[0].pointNumber;
+                const pointData = allData[pointIndex];
+
+                // Prevent duplicate selection
+                if (selection.length === 1 && selection[0].icd3 === pointData.icd3) return;
+
+                selection.push(pointData);
+                if (selection.length > 2) selection.shift();
+                updateUI();
+            });
+        }
+
+        function renderLegend(data) {
+            const seen = new Map();
+            data.forEach(d => {
+                if (d.chapter && !seen.has(d.chapter)) {
+                    seen.set(d.chapter, d.color);
+                }
+            });
+
+            const sorted = Array.from(seen.entries()).sort((a, b) => a[0].localeCompare(b[0]));
+            const legend = document.getElementById('legend');
+            legend.innerHTML = sorted.map(([chapter, color]) => `
+                <div class="legend-item">
+                    <span class="legend-swatch" style="background:${color}"></span>
+                    <span>${chapter}</span>
+                </div>
+            `).join('');
+        }
+
+        function cosineSimilarity(vecA, vecB) {
+            let dot = 0, normA = 0, normB = 0;
+            for (let i = 0; i < 120; i++) {
+                const a = parseFloat(vecA[`emb_${i}`]);
+                const b = parseFloat(vecB[`emb_${i}`]);
+                dot += a * b;
+                normA += a * a;
+                normB += b * b;
+            }
+            return dot / (Math.sqrt(normA) * Math.sqrt(normB));
+        }
+
+        function similarityInterpretation(sim) {
+            if (sim >= 0.85) return 'Very high — these disorders occupy nearly the same region of trajectory space.';
+            if (sim >= 0.70) return 'High — substantial overlap in patient profiles, timing, and co-occurring conditions.';
+            if (sim >= 0.50) return 'Moderate — partial overlap in clinical trajectories.';
+            if (sim >= 0.30) return 'Modest — limited but non-trivial shared structure.';
+            return 'Low — these disorders sit in distinct regions of trajectory space.';
+        }
+
+        function renderSlot(label, point) {
+            if (!point) {
+                return `
+                    <div class="selection-slot">
+                        <div class="slot-label">${label}</div>
+                        <div class="slot-empty">—</div>
+                    </div>
+                `;
+            }
+            return `
+                <div class="selection-slot">
+                    <div class="slot-label">${label}</div>
+                    <div class="slot-name">${point.name}</div>
+                    <div class="slot-meta">
+                        <span class="slot-chip" style="--chip-color:${point.color}">${point.chapter || 'Unclassified'}</span>
+                        <span class="slot-icd">${point.icd3}</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        function updateUI() {
+            const infoDiv = document.getElementById('info');
+
+            if (selection.length === 0) {
+                infoDiv.innerHTML = `
+                    <div class="compare-empty">
+                        Click a point on the map to begin.
+                    </div>
+                `;
+                return;
+            }
+
+            let html = renderSlot('Disorder A', selection[0]);
+            html += renderSlot('Disorder B', selection[1]);
+
+            if (selection.length === 2) {
+                const sim = cosineSimilarity(selection[0], selection[1]);
+                html += `
+                    <div class="result">
+                        <div class="result-label">Cosine Similarity</div>
+                        <div class="result-value">${sim.toFixed(3)}</div>
+                        <div class="result-caption">${similarityInterpretation(sim)}</div>
+                        <button class="reset-btn" onclick="resetSelection()">↻ Reset</button>
+                    </div>
+                `;
+            } else {
+                html += `
+                    <div class="result">
+                        <div class="result-label">Awaiting second selection</div>
+                        <div class="result-caption">Click another point to compute cosine similarity.</div>
+                        <button class="reset-btn" onclick="resetSelection()">↻ Clear</button>
+                    </div>
+                `;
+            }
+
+            infoDiv.innerHTML = html;
+        }
+
+        function resetSelection() {
+            selection = [];
+            updateUI();
+        }
+    </script>
+</body>
+</html>
