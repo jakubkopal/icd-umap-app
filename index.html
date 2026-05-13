@@ -634,8 +634,8 @@
         }
 
         function similarityInterpretation(sim) {
-            if (sim >= 0.8992) return 'Very high — these disorders occupy nearly the same region of trajectory space (Top 10%).';
-            if (sim >= 0.8550) return 'High — substantial overlap in patient profiles, timing, and co-occurring conditions (Higher 25%).';
+            if (sim >= 0.8988) return 'Very high — these disorders occupy nearly the same region of trajectory space (Top 10%).';
+            if (sim >= 0.8549) return 'High — substantial overlap in patient profiles, timing, and co-occurring conditions (Higher 25%).';
             if (sim >= 0.8104) return 'Moderate — partial overlap in clinical trajectories (Median 50%).';
             if (sim >= 0.7509) return 'Modest — limited but non-trivial shared structure (Lower 25%).';
             return 'Low — these disorders sit in distinct regions of trajectory space (Botoom 10%).';
