@@ -69,7 +69,7 @@ Open `calculate_boundary.ipynb` in Jupyter and run all cells in order. The noteb
 
 If you use this code or the interactive tool, please cite:
 
-> [Authors]. Clinical trajectories and genetic architecture across the neurological–psychiatric boundary. *Journal*, [year]. DOI: [pending]
+> [Kopal, J., et al.]. Clinical trajectories and genetic architecture across the neurological–psychiatric boundary. *Journal*, [year]. DOI: [pending]
 
 ---
 
