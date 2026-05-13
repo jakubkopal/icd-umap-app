@@ -507,13 +507,13 @@
         </section>
 
         <div class="legend-panel">
-            <div class="legend-title">ICD-10 </div>
+            <div class="legend-title">ICD-10 Chapter</div>
             <div id="legend" class="legend-grid"></div>
         </div>
 
         <footer>
             <div>Delphi-2M Disease Embedding Explorer</div>
-            <div><a href="https://github.com/jakubkopal/icd_umap_app" target="_blank" rel="noopener">View source</a></div>
+            <div><a href="https://github.com" target="_blank" rel="noopener">View source</a></div>
         </footer>
     </div>
 
@@ -606,7 +606,7 @@
         function renderLegend(data) {
             const seen = new Map();
             data.forEach(d => {
-                if (d. && !seen.has(d.chapter)) {
+                if (d.chapter && !seen.has(d.chapter)) {
                     seen.set(d.chapter, d.color);
                 }
             });
@@ -634,11 +634,11 @@
         }
 
         function similarityInterpretation(sim) {
-            if (sim >= 0.8992) return 'Very high — these disorders occupy nearly the same region of trajectory space (Top 10%).';
-            if (sim >= 0.8550) return 'High — substantial overlap in patient profiles, timing, and co-occurring conditions (Top 25%).';
-            if (sim >= 0.8104) return 'Moderate — partial overlap in clinical trajectories (Median 50%).';
-            if (sim >= 0.7509) return 'Modest — limited but non-trivial shared structure (Lower 25%).';
-            return 'Low — these disorders sit in distinct regions of trajectory space (Bottom 10%).';
+            if (sim >= 0.85) return 'Very high — these disorders occupy nearly the same region of trajectory space.';
+            if (sim >= 0.70) return 'High — substantial overlap in patient profiles, timing, and co-occurring conditions.';
+            if (sim >= 0.50) return 'Moderate — partial overlap in clinical trajectories.';
+            if (sim >= 0.30) return 'Modest — limited but non-trivial shared structure.';
+            return 'Low — these disorders sit in distinct regions of trajectory space.';
         }
 
         function renderSlot(label, point) {
