@@ -9,7 +9,7 @@ Code and interactive supplement to the manuscript submitted to *Nature Neuroscie
 
 ## Abstract
 
-Neurological and psychiatric disorders are historically classified as distinct categories, yet whether clinical and genetic similarity jointly trace this boundary has not been examined. Combining disease trajectory embeddings from a recent foundation model with genome-wide genetic similarity estimates, we show that the boundary is largely respected, but that multiple sclerosis, migraine, and essential tremor cross it in both measures. These findings support a more integrated approach to studying and treating brain disease across the traditional neurological–psychiatric divide.
+Genetic studies have revealed substantial pleiotropy crossing the neurological–psychiatric boundary, but whether clinical trajectory similarity follows the same pattern is unknown. Combining disease trajectory embeddings from a foundation model with genome-wide genetic similarity estimates, we find that clinical trajectory similarity mirrors genetic pleiotropy, including which disorders cross the boundary. These findings support a more integrated approach to brain disease across the traditional neurological–psychiatric divide.
 
 ---
 
@@ -17,7 +17,7 @@ Neurological and psychiatric disorders are historically classified as distinct c
 
 An interactive UMAP explorer of the Delphi-2M disease embedding space is available at:
 
-**[username.github.io/neuropsych-boundary](https://username.github.io/neuropsych-boundary)**
+**[username.github.io/neuropsych-boundary](https://jakubkopal.github.io/neuropsych-boundary)**
 
 Click any two disorders to compute their pairwise cosine similarity across the full 120-dimensional embedding space.
 
@@ -36,9 +36,9 @@ Click any two disorders to compute their pairwise cosine similarity across the f
 
 | Source | Description | Availability |
 |--------|-------------|--------------|
-| UK Biobank (application 27412) | Electronic health records for Delphi-2M training | [ukbiobank.ac.uk](https://www.ukbiobank.ac.uk) |
+| UK Biobank | Electronic health records for Delphi-2M training | [ukbiobank.ac.uk](https://www.ukbiobank.ac.uk) |
 | Shmatko et al. (2025) | Delphi-2M model and synthetic trajectories | [Nature](https://doi.org/10.1038/s41586-025-09529-3) |
-| Smeland et al. (2025) | Pairwise genetic correlation estimates | Supplementary materials of that publication |
+| Smeland et al. (2025) | Pairwise genetic correlation estimates | [Nature Neuroscience](https://doi.org/10.1038/s41593-025-02090-2) |
 
 Raw UK Biobank data cannot be shared publicly due to controlled access restrictions. The `embeddings.csv` file contains embeddings derived from the synthetic UK Biobank trajectories released by Shmatko et al., which can be used to reproduce the visualization and similarity analyses.
 
@@ -69,7 +69,7 @@ Open `calculate_boundary.ipynb` in Jupyter and run all cells in order. The noteb
 
 If you use this code or the interactive tool, please cite:
 
-> [Authors]. Clinical trajectories and genetic architecture trace the same boundary between neurological and psychiatric disorders. *Nature Neuroscience*, [year]. DOI: [pending]
+> [Authors]. Clinical trajectories and genetic architecture across the neurological–psychiatric boundary. *Journal*, [year]. DOI: [pending]
 
 ---
 
